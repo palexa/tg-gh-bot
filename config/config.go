@@ -7,7 +7,9 @@ import (
 	"os"
 )
 
-func LoadConfig() (*models.Config,error) {
+var Cfg *models.Config
+
+func LoadConfig() (*models.Config, error) {
 	configFile, err := os.Open("config.yml")
 	if err != nil {
 		middleware.ProcessError(err)
