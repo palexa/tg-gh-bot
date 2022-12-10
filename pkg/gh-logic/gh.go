@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"ghActionTelegramBot/config"
+	"ghActionTelegramBot/internal/config"
 	"io"
 	"log"
 	"net/http"
@@ -53,6 +53,7 @@ func loggedinHandler(w http.ResponseWriter, r *http.Request, githubData string) 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `<a href="/login/github/">LOGIN</a>`)
 }
+
 func getGithubClientID() string {
 
 	githubClientID := config.Cfg.GitHub.ClientId

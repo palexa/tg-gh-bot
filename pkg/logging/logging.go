@@ -1,5 +1,4 @@
-package middleware
-
+package logging
 
 func ProcessError(err error) {
 	//TODO process error -> logging -> etc

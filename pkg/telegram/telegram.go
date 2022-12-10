@@ -2,9 +2,10 @@ package telegram
 
 import (
 	"fmt"
-	"ghActionTelegramBot/models"
+	"ghActionTelegramBot/internal/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
+
 var numericKeyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("1"),
@@ -30,7 +31,8 @@ var numericKeyboard2 = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardButtonData("6", "6"),
 	),
 )
-func InitTelegramBot(config *models.Config) {
+
+func InitTelegramBot(config *config.Config) {
 	bot, err := tgbotapi.NewBotAPI(config.Telegram.Token)
 	if err != nil {
 		fmt.Println("error", err.Error())
@@ -38,7 +40,7 @@ func InitTelegramBot(config *models.Config) {
 	}
 
 	bot.Debug = true
-	info,_ := bot.GetWebhookInfo()
+	info, _ := bot.GetWebhookInfo()
 	fmt.Println(info)
 	updateConfig := tgbotapi.NewUpdate(0)
 
@@ -83,14 +85,14 @@ func InitTelegramBot(config *models.Config) {
 	}
 }
 
-func openKeyboard(msg * tgbotapi.MessageConfig) {
+func openKeyboard(msg *tgbotapi.MessageConfig) {
 	msg.ReplyMarkup = numericKeyboard
 }
 
-func openInlineKeyboard(msg * tgbotapi.MessageConfig) {
+func openInlineKeyboard(msg *tgbotapi.MessageConfig) {
 	msg.ReplyMarkup = numericKeyboard2
 }
 
-func replyToMessageId(msg * tgbotapi.MessageConfig, messageId int) {
+func replyToMessageId(msg *tgbotapi.MessageConfig, messageId int) {
 	msg.ReplyToMessageID = messageId
 }
