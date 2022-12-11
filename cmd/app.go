@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	task2 "ghActionTelegramBot/internal/adapters/db/task"
+	"ghActionTelegramBot/internal/adapters/db/person"
 	"ghActionTelegramBot/internal/config"
+	person2 "ghActionTelegramBot/internal/domain/person"
 	"ghActionTelegramBot/internal/domain/task"
 	"ghActionTelegramBot/pkg/client/mongodb"
-	gh_logic2 "ghActionTelegramBot/pkg/gh-logic"
-	telegram2 "ghActionTelegramBot/pkg/telegram"
+	"ghActionTelegramBot/pkg/gh-logic"
+	"ghActionTelegramBot/pkg/telegram"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 )
@@ -31,22 +32,35 @@ func main() {
 		log.Fatal(err)
 	}
 
-	storage := task2.NewStorage(db)
+	//taskStorage := task2.NewStorage(db)
+	//_ = task.NewService(taskStorage)
 
-	service := task.NewService(storage)
+	userStorage := person.NewStorage(db)
+	service := person2.NewService(userStorage)
 
-	t := &task.CreateTaskDto{
-		Text: "test str",
-	}
-	_, err = service.Create(t)
+	users, err := service.GetAll()
 	if err != nil {
 		panic(err)
 	}
-	tasks, _ := service.GetAll()
-	fmt.Println(tasks)
+	fmt.Println(users)
 
-	go gh_logic2.RunServer()
-	telegram2.InitTelegramBot(config.Cfg)
+	//t := &task.CreateTaskDto{
+	//	Text: "test str",
+	//}
+	//_, err = taskService.Create(t)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//tasks, _ := taskService.GetAll()
+	//fmt.Println(tasks)
+
+	go gh_logic.RunServer()
+	bot, err := telegram.NewTGBot(config.Cfg.Telegram.Token, service)
+	if err != nil {
+		panic(err)
+	}
+	bot.Start()
+	//telegram.InitTelegramBot(config.Cfg, service)
 }
 
 func createTask(task *task.Task) error {
