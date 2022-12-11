@@ -13,6 +13,10 @@ type storage struct {
 	db *mongo.Database
 }
 
+func NewStorage(db *mongo.Database) task.Storage {
+	return &storage{db: db}
+}
+
 func (s *storage) Create(dto *task.CreateTaskDto) (*task.Task, error) {
 	t := &task.Task{
 		ID:        primitive.NewObjectID(),
@@ -32,10 +36,6 @@ func (s *storage) GetAll() ([]*task.Task, error) {
 	// passing bson.D{{}} matches all documents in the collection
 	filter := bson.D{{}}
 	return s.filterTasks(filter)
-}
-
-func NewStorage(db *mongo.Database) task.Storage {
-	return &storage{db: db}
 }
 
 func (s *storage) filterTasks(filter interface{}) ([]*task.Task, error) {
