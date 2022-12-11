@@ -1,42 +1,86 @@
-package gh_logic
+package gh
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"ghActionTelegramBot/internal/adapters/api"
 	"ghActionTelegramBot/internal/config"
+	"ghActionTelegramBot/internal/domain/person"
+	"github.com/gofiber/fiber/v2"
 	"io"
 	"log"
 	"net/http"
 )
 
-func RunServer() {
-	http.HandleFunc("/", rootHandler)
-
-	http.HandleFunc("/login/github/", githubLoginHandler)
-
-	http.HandleFunc("/login/github/callback", githubCallbackHandler)
-	http.HandleFunc("/login/github/callback2", githubCallbackHandlerToCheck)
-
-	http.HandleFunc("/loggedin", func(w http.ResponseWriter, r *http.Request) {
-		loggedinHandler(w, r, "")
-	})
-
-	fmt.Println("[ UP ON PORT 3000 ]")
-	log.Panic(
-		http.ListenAndServe(":3000", nil),
-	)
+type handler struct {
+	app     *fiber.App
+	service person.Service
 }
 
-func loggedinHandler(w http.ResponseWriter, r *http.Request, githubData string) {
+func NewHandler(service person.Service) api.Handler {
+	app := fiber.New()
+	return &handler{app: app, service: service}
+}
+
+func (h *handler) Run() {
+	h.Register()
+	log.Fatal(h.app.Listen(":3000"))
+}
+
+func (h *handler) Register() {
+	h.app.Get("/", h.Root)
+	h.app.Get("/login/github/", h.GitHubLogin)
+	h.app.Get("/login/github/callback", h.GitHubCallback)
+}
+
+func (h *handler) Root(c *fiber.Ctx) error {
+	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	err := c.SendString(`<a href="/login/github/">LOGIN</a>`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *handler) GitHubLogin(c *fiber.Ctx) error {
+	githubClientID := getGithubClientID()
+
+	redirectURL := fmt.Sprintf(
+		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
+		githubClientID,
+		"http://localhost:3000/login/github/callback",
+	)
+	err := c.Redirect(redirectURL, 301)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *handler) GitHubCallback(c *fiber.Ctx) error {
+	code := c.Query("code")
+
+	githubAccessToken := getGithubAccessToken(code)
+
+	githubData := getGithubData(githubAccessToken)
+
+	return h.LoggedInHandler(c, githubData)
+}
+
+func (h *handler) LoggedInHandler(c *fiber.Ctx, githubData string) error {
 	if githubData == "" {
 		// Unauthorized users get an unauthorized message
-		fmt.Fprintf(w, "UNAUTHORIZED!")
-		return
+		_, err := c.Write([]byte("UNAUTHORIZED!"))
+		if err != nil {
+			return err
+		}
+		//fmt.Fprintf(w, "UNAUTHORIZED!")
+		return nil
 	}
 
 	// Set return type JSON
-	w.Header().Set("Content-type", "application/json")
+	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
 
 	// Prettifying the json
 	var prettyJSON bytes.Buffer
@@ -47,11 +91,8 @@ func loggedinHandler(w http.ResponseWriter, r *http.Request, githubData string) 
 	}
 
 	// Return the prettified JSON as a string
-	fmt.Fprintf(w, string(prettyJSON.Bytes()))
-}
-
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `<a href="/login/github/">LOGIN</a>`)
+	return c.Send(prettyJSON.Bytes())
+	//fmt.Fprintf(w, string(prettyJSON.Bytes()))
 }
 
 func getGithubClientID() string {
@@ -66,32 +107,6 @@ func getGithubClientSecret() string {
 	githubClientSecret := config.Cfg.GitHub.ClientSecret
 
 	return githubClientSecret
-}
-
-func githubLoginHandler(w http.ResponseWriter, r *http.Request) {
-	githubClientID := getGithubClientID()
-
-	redirectURL := fmt.Sprintf(
-		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
-		githubClientID,
-		"http://localhost:3000/login/github/callback",
-	)
-
-	http.Redirect(w, r, redirectURL, 301)
-}
-
-func githubCallbackHandler(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
-
-	githubAccessToken := getGithubAccessToken(code)
-
-	githubData := getGithubData(githubAccessToken)
-
-	loggedinHandler(w, r, githubData)
-}
-
-func githubCallbackHandlerToCheck(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "")
 }
 
 func getGithubAccessToken(code string) string {
@@ -133,8 +148,10 @@ func getGithubAccessToken(code string) string {
 
 	// Convert stringified JSON to a struct object of type githubAccessTokenResponse
 	var ghresp githubAccessTokenResponse
-	json.Unmarshal(respbody, &ghresp)
+	err := json.Unmarshal(respbody, &ghresp)
+	if err != nil {
 
+	}
 	// Return the access token (as the rest of the
 	// details are relatively unnecessary for us)
 	return ghresp.AccessToken
