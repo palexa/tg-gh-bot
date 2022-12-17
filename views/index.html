@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My GitHub Bot</title>
+    <style>
+        .button {
+            align-items: center;
+            appearance: none;
+            background-color: #FCFCFD;
+            border-radius: 4px;
+            border-width: 0;
+            box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+            box-sizing: border-box;
+            color: #36395A;
+            cursor: pointer;
+            display: inline-flex;
+            font-family: "JetBrains Mono", monospace;
+            height: 48px;
+            justify-content: center;
+            line-height: 1;
+            list-style: none;
+            overflow: hidden;
+            padding-left: 16px;
+            padding-right: 16px;
+            position: relative;
+            text-align: left;
+            text-decoration: none;
+            transition: box-shadow .15s, transform .15s;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            white-space: nowrap;
+            will-change: box-shadow, transform;
+            font-size: 18px;
+        }
+
+        .button:focus {
+            box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+        }
+
+        .button:hover {
+            box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            box-shadow: #D6D6E7 0 3px 7px inset;
+            transform: translateY(2px);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;900&display=swap');
+
+        body {
+            background: #f2f2f2;
+        }
+
+        .container  {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            height: 400px;
+            width: 600px;
+            background: #f2f2f2;
+            overflow: hidden;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 0 20px 8px #d0d0d0;
+        }
+
+        .content {
+            position: absolute;
+            width: 600px;
+            top: 50%;
+            transform: translatey(-50%);
+            text-align: justify;
+            color: black;
+            padding: 40px;
+            font-family: 'Merriweather', serif;
+        }
+        .info {
+            margin-left: -40px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-weight: 900;
+            text-align: center;
+        }
+
+        h3 {
+            font-weight: 300;
+        }
+
+        .flap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .flap::before {
+            position: absolute;
+            content: "";
+            height: 100%;
+            width: 50%;
+            background: url("https://pbs.twimg.com/profile_images/1347260174176710658/2GfSZ1i__400x400.jpg") white;
+            background-position: 100px;
+            background-repeat: no-repeat;
+            transition: 1s;
+        }
+
+        .flap::after {
+            position: absolute;
+            content: "";
+            height: 100%;
+            width: 50%;
+            right: 0;
+            background: url("https://pbs.twimg.com/profile_images/1347260174176710658/2GfSZ1i__400x400.jpg") white;
+            background-position: -200px;
+            background-repeat: no-repeat;
+            transition: 1s;
+        }
+
+        .container:hover .flap::after {
+            transform: translatex(300px);
+        }
+
+        .container:hover .flap::before{
+            transform: translatex(-300px);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="content">
+        <div class="info">
+            <h1>My TG Bot</h1>
+            <a class="button" role="button" href="{{.Link}}">Sign in</a>
+        </div>
+    </div>
+    <div class="flap"></div>
+</div>
+</body>
+</html>

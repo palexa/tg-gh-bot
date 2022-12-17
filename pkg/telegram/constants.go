@@ -18,7 +18,7 @@ var (
 	numericKeyboard2 = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonURL("dev-vert", "https://a.verticula.xyz"),
-			tgbotapi.NewInlineKeyboardButtonData("2", "2"),
+			tgbotapi.NewInlineKeyboardButtonURL("GitHub", "http://127.0.0.1:3000/10"),
 			tgbotapi.NewInlineKeyboardButtonData("3", "3"),
 		),
 		tgbotapi.NewInlineKeyboardRow(

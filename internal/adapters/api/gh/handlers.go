@@ -8,6 +8,7 @@ import (
 	"ghActionTelegramBot/internal/config"
 	"ghActionTelegramBot/internal/domain/person"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html"
 	"io"
 	"log"
 	"net/http"
@@ -19,7 +20,10 @@ type handler struct {
 }
 
 func NewHandler(service person.Service) api.Handler {
-	app := fiber.New()
+	engine := html.New("./views", ".html")
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 	return &handler{app: app, service: service}
 }
 
@@ -29,27 +33,26 @@ func (h *handler) Run() {
 }
 
 func (h *handler) Register() {
-	h.app.Get("/", h.Root)
-	h.app.Get("/login/github/", h.GitHubLogin)
-	h.app.Get("/login/github/callback", h.GitHubCallback)
+	h.app.Get("/:id", h.Root)
+	h.app.Get("/login/github/:id", h.GitHubLogin)
+	h.app.Get("/login/github/callback/:id", h.GitHubCallback)
+
 }
 
 func (h *handler) Root(c *fiber.Ctx) error {
-	c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	err := c.SendString(`<a href="/login/github/">LOGIN</a>`)
-	if err != nil {
-		return err
-	}
-	return nil
+	//id := c.Params("id")
+	return c.Render("index", fiber.Map{"Link": "http://localhost:3000/login/github/10"})
 }
 
 func (h *handler) GitHubLogin(c *fiber.Ctx) error {
+	userId := c.Params("id")
+	fmt.Println(userId)
 	githubClientID := getGithubClientID()
 
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
 		githubClientID,
-		"http://localhost:3000/login/github/callback",
+		"http://localhost:3000/login/github/callback"+userId,
 	)
 	err := c.Redirect(redirectURL, 301)
 	if err != nil {
@@ -59,6 +62,9 @@ func (h *handler) GitHubLogin(c *fiber.Ctx) error {
 }
 
 func (h *handler) GitHubCallback(c *fiber.Ctx) error {
+	userId := c.Params("id")
+	fmt.Println(userId)
+
 	code := c.Query("code")
 
 	githubAccessToken := getGithubAccessToken(code)
