@@ -33,26 +33,24 @@ func (h *handler) Run() {
 }
 
 func (h *handler) Register() {
-	h.app.Get("/:id", h.Root)
-	h.app.Get("/login/github/:id", h.GitHubLogin)
-	h.app.Get("/login/github/callback/:id", h.GitHubCallback)
-
+	h.app.Get("/:userId", h.Root)
+	h.app.Get("/login/github/:userId", h.GitHubLogin)
+	h.app.Get("/login/github/callback/:userId", h.GitHubCallback)
 }
 
 func (h *handler) Root(c *fiber.Ctx) error {
-	//id := c.Params("id")
-	return c.Render("index", fiber.Map{"Link": "http://localhost:3000/login/github/10"})
+	userId := c.Params("userId")
+	return c.Render("index", fiber.Map{"Link": fmt.Sprintf("http://localhost:3000/login/github/%s", userId)})
 }
 
 func (h *handler) GitHubLogin(c *fiber.Ctx) error {
-	userId := c.Params("id")
-	fmt.Println(userId)
+	userId := c.Params("userId")
 	githubClientID := getGithubClientID()
 
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
 		githubClientID,
-		"http://localhost:3000/login/github/callback"+userId,
+		fmt.Sprintf("http://localhost:3000/login/github/callback/%s", userId),
 	)
 	err := c.Redirect(redirectURL, 301)
 	if err != nil {
@@ -62,12 +60,21 @@ func (h *handler) GitHubLogin(c *fiber.Ctx) error {
 }
 
 func (h *handler) GitHubCallback(c *fiber.Ctx) error {
-	userId := c.Params("id")
+	userId := c.Params("userId")
 	fmt.Println(userId)
 
 	code := c.Query("code")
 
 	githubAccessToken := getGithubAccessToken(code)
+
+	err := h.service.SetGHToken(&person.UpdatePersonDto{
+		ID:          userId,
+		AccessToken: githubAccessToken,
+	})
+
+	if err != nil {
+
+	}
 
 	githubData := getGithubData(githubAccessToken)
 

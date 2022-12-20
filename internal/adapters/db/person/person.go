@@ -23,7 +23,7 @@ func (s *storage) FindByTelegramId(telegramId int) (*person.Person, error) {
 		{"$and",
 			bson.A{
 				bson.D{
-					{"telegram_id", bson.D{{"$eq", 25}}},
+					{"telegram_id", bson.D{{"$eq", telegramId}}},
 				},
 			},
 		},
@@ -68,7 +68,10 @@ func (s *storage) Update(dto *person.UpdatePersonDto) (*person.Person, error) {
 		TelegramId:  dto.TelegramId,
 		AccessToken: dto.AccessToken,
 	}
-	s.db.Collection("users").UpdateByID(context.TODO(), dto.ID, p)
+	_, err := s.db.Collection("users").UpdateByID(context.TODO(), dto.ID, p)
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
@@ -108,6 +111,19 @@ func (s *storage) filterUsers(filter interface{}) ([]*person.Person, error) {
 	return users, nil
 }
 
+func (s *storage) FindById(id int) (*person.Person, error) {
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{
+					{"_id", bson.D{{"$eq", id}}},
+				},
+			},
+		},
+	}
+	return s.filterOne(filter)
+}
+
 func (s *storage) filterOne(filter interface{}) (*person.Person, error) {
 	var user person.Person
 	result := s.db.Collection("users").FindOne(context.TODO(), filter)
@@ -122,6 +138,16 @@ func (s *storage) filterOne(filter interface{}) (*person.Person, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (s *storage) UpdateGHToken(id int, token string) error {
+	filter := bson.D{{"_id", id}}
+	update := bson.D{{"$set", bson.D{{"access_token", token}}}}
+	_, err := s.db.Collection("users").UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *storage) FindOrCreate(dto *person.CreatePersonDto) (*person.Person, error) {
