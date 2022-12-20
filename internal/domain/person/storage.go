@@ -7,5 +7,5 @@ type Storage interface {
 	FindByTelegramId(telegramId int) (*Person, error)
 	FindById(id int) (*Person, error)
 	GetAll() ([]*Person, error)
-	UpdateGHToken(id int, token string) error
+	UpdateGHToken(id string, token string) error
 }

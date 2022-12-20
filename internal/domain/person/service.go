@@ -1,7 +1,5 @@
 package person
 
-import "strconv"
-
 type Service interface {
 	Create(dto *CreatePersonDto) (*Person, error)
 	Update(dto *UpdatePersonDto) (*Person, error)
@@ -28,11 +26,7 @@ func (s *service) Update(dto *UpdatePersonDto) (*Person, error) {
 }
 
 func (s *service) SetGHToken(dto *UpdatePersonDto) error {
-	id, err := strconv.Atoi(dto.ID)
-	if err != nil {
-
-	}
-	err = s.storage.UpdateGHToken(id, dto.AccessToken)
+	err := s.storage.UpdateGHToken(dto.ID, dto.AccessToken)
 	if err != nil {
 		return err
 	}

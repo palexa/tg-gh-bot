@@ -1,6 +1,9 @@
 package telegram
 
-import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+import (
+	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
 
 var (
 	numericKeyboard = tgbotapi.NewReplyKeyboard(
@@ -28,3 +31,11 @@ var (
 		),
 	)
 )
+
+func generateGitHubButtonKeyboardMarkup(userId string) tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonURL("GitHub", fmt.Sprintf("http://127.0.0.1:3000/%s", userId)),
+		),
+	)
+}

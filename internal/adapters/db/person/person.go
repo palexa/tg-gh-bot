@@ -140,7 +140,8 @@ func (s *storage) filterOne(filter interface{}) (*person.Person, error) {
 	return &user, nil
 }
 
-func (s *storage) UpdateGHToken(id int, token string) error {
+func (s *storage) UpdateGHToken(idHex string, token string) error {
+	id, _ := primitive.ObjectIDFromHex(idHex)
 	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$set", bson.D{{"access_token", token}}}}
 	_, err := s.db.Collection("users").UpdateOne(context.TODO(), filter, update)
