@@ -40,7 +40,7 @@ func (h *handler) Register() {
 
 func (h *handler) Root(c *fiber.Ctx) error {
 	userId := c.Params("userId")
-	return c.Render("index", fiber.Map{"Link": fmt.Sprintf("http://localhost:3000/login/github/%s", userId)})
+	return c.Render("index", fiber.Map{"Link": fmt.Sprintf("%s/login/github/%s", config.Cfg.BaseUrl, userId)})
 }
 
 func (h *handler) GitHubLogin(c *fiber.Ctx) error {
@@ -50,7 +50,7 @@ func (h *handler) GitHubLogin(c *fiber.Ctx) error {
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
 		githubClientID,
-		fmt.Sprintf("http://localhost:3000/login/github/callback/%s", userId),
+		fmt.Sprintf("%s/login/github/callback/%s", config.Cfg.BaseUrl, userId),
 	)
 	err := c.Redirect(redirectURL, 301)
 	if err != nil {
@@ -165,8 +165,6 @@ func getGithubAccessToken(code string) string {
 	if err != nil {
 
 	}
-	// Return the access token (as the rest of the
-	// details are relatively unnecessary for us)
 	return ghresp.AccessToken
 }
 

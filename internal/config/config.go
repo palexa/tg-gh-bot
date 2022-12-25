@@ -7,13 +7,14 @@ import (
 )
 
 type Config struct {
+	BaseUrl  string `yaml:"base_url"`
 	Telegram struct {
 		Token string `yaml:"token"`
 	} `yaml:"telegram"`
 	GitHub struct {
-		ClientId     string `yaml:"clientId"`
-		ClientSecret string `yaml:"clientSecret"`
-	} `yaml:"gitHub"`
+		ClientId     string `yaml:"client_id"`
+		ClientSecret string `yaml:"client_secret"`
+	} `yaml:"git_hub"`
 	Database struct {
 		Username   string `yaml:"username"`
 		Password   string `yaml:"password"`

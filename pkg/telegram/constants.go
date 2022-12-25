@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"fmt"
+	"ghActionTelegramBot/internal/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -21,7 +22,7 @@ var (
 	numericKeyboard2 = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonURL("dev-vert", "https://a.verticula.xyz"),
-			tgbotapi.NewInlineKeyboardButtonURL("GitHub", "http://127.0.0.1:3000/10"),
+			tgbotapi.NewInlineKeyboardButtonData("2", "2"),
 			tgbotapi.NewInlineKeyboardButtonData("3", "3"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
@@ -35,7 +36,7 @@ var (
 func generateGitHubButtonKeyboardMarkup(userId string) tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL("GitHub", fmt.Sprintf("http://127.0.0.1:3000/%s", userId)),
+			tgbotapi.NewInlineKeyboardButtonURL("GitHub", fmt.Sprintf("%s/%s", config.Cfg.BaseUrl, userId)),
 		),
 	)
 }
