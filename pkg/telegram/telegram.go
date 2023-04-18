@@ -52,6 +52,8 @@ func (b *ghBot) Start() {
 					msg.Text = "I'm ok."
 				case "auth":
 					b.openGitHubAuthKeyboard(&msg, &update)
+				case "user":
+					b.ghUserData(&msg, &update)
 				case "opens":
 					b.openInlineKeyboard(&msg)
 				case "open":

@@ -83,29 +83,22 @@ func (h *handler) GitHubCallback(c *fiber.Ctx) error {
 
 func (h *handler) LoggedInHandler(c *fiber.Ctx, githubData string) error {
 	if githubData == "" {
-		// Unauthorized users get an unauthorized message
 		_, err := c.Write([]byte("UNAUTHORIZED!"))
 		if err != nil {
 			return err
 		}
-		//fmt.Fprintf(w, "UNAUTHORIZED!")
 		return nil
 	}
 
-	// Set return type JSON
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
 
-	// Prettifying the json
 	var prettyJSON bytes.Buffer
-	// json.indent is a library utility function to prettify JSON indentation
 	parserr := json.Indent(&prettyJSON, []byte(githubData), "", "\t")
 	if parserr != nil {
 		log.Panic("JSON parse error")
 	}
 
-	// Return the prettified JSON as a string
 	return c.Send(prettyJSON.Bytes())
-	//fmt.Fprintf(w, string(prettyJSON.Bytes()))
 }
 
 func getGithubClientID() string {
@@ -123,7 +116,6 @@ func getGithubClientSecret() string {
 }
 
 func getGithubAccessToken(code string) string {
-
 	clientID := getGithubClientID()
 	clientSecret := getGithubClientSecret()
 
@@ -169,7 +161,6 @@ func getGithubAccessToken(code string) string {
 }
 
 func getGithubData(accessToken string) string {
-	// Get request to a set URL
 	req, reqerr := http.NewRequest(
 		"GET",
 		"https://api.github.com/user",
@@ -182,15 +173,12 @@ func getGithubData(accessToken string) string {
 	authorizationHeaderValue := fmt.Sprintf("token %s", accessToken)
 	req.Header.Set("Authorization", authorizationHeaderValue)
 
-	// Make the request
 	resp, resperr := http.DefaultClient.Do(req)
 	if resperr != nil {
 		log.Panic("Request failed")
 	}
 
-	// Read the response as a byte slice
 	respbody, _ := io.ReadAll(resp.Body)
 
-	// Convert byte slice to string and return
 	return string(respbody)
 }

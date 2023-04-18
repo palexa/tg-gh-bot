@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Telegram Bot UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script async src="https://telegram.org/js/telegram-web-app.js" data-telegram-login="my-github" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+    <script>
+        function onTelegramAuth(user) {
+            // Handle authentication and send a message to the bot
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // Handle successful response from the bot
+                }
+            };
+            xhttp.open("POST", "https://api.telegram.org/botmy-github/sendMessage", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("chat_id=" + user.id + "&text=Hello, " + user.first_name + "!");
+        }
+    </script>
+</head>
+<body>
+<div class="tg-widget" data-telegram-login="YOUR_TELEGRAM_BOT_USERNAME" data-size="large" data-auth-url="https://api.telegram.org/bot5907957534:AAFchIn91_L8pz2LR-BeMYYpUD0dmg-ZBpM/login"></div>
+<script>
+    document.getElementsByClassName('tg-widget')[0].setAttribute('onclick', '');
+</script>
+<button onclick="sendMessage()">Send Message</button>
+<script>
+    function sendMessage() {
+        // Send a message to the bot
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                // Handle successful response from the bot
+            }
+        };
+        xhttp.open("POST", "https://api.telegram.org/bot5907957534:AAFchIn91_L8pz2LR-BeMYYpUD0dmg-ZBpM/sendMessage", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("chat_id=YOUR_CHAT_ID&text=Hello, World!");
+    }
+</script>
+</body>
+</html>
